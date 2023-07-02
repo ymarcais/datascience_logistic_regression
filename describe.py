@@ -147,7 +147,7 @@ class Describe:
 def main():
 
 	db = Describe(dataset_only_digit=None)
-	dataset = db.open_data("datasets/dataset_test.csv")
+	dataset = db.open_data("datasets/dataset_train.csv")
 	resume = db.generate_resume(dataset)
 	'''i = db.count_column(dataset)
 	j = db.count_rows(dataset)
