@@ -12,6 +12,6 @@ Data Analysis - Logistic Regression
 - Statistics standard deviation without mean() and std() functions but using groupby()
 - Plot histogram with np.histogram()
 
-  #V.2.2 Scatter plot
-  - Similarities the Pearson's correlation : r = (Σ((X - X̄) * (Y - Ȳ))) / sqrt(Σ((X - X̄)^2) * Σ((Y - Ȳ)^2))
+#V.2.2 Scatter plot
+- Similarities the Pearson's correlation : r = (Σ((X - X̄) * (Y - Ȳ))) / sqrt(Σ((X - X̄)^2) * Σ((Y - Ȳ)^2))
 
