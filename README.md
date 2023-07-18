@@ -3,7 +3,7 @@ Data Analysis - Logistic Regression
 
 # V.1 Data Analysis
 - Clean Data (NaN, empty columns...)
-- Calculate : Mean, std, min, max, quartiles (without using related functions°
+- Calculate : Mean, std, min, max, quartiles (without using related functions)
 
 # V.2 Data Visualization
 #V.2.1 Histogram
