@@ -13,7 +13,7 @@ class Pearson_correlation:
 				row_count += 1
 		return row_count
     
-    def iter_rows(feature_1, feature_2):
+    def iter_rows(feature_1, feature_2):g
         for 
 
 def	main():
