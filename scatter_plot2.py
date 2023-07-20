@@ -57,7 +57,7 @@ class R_correlation:
 		if r2 == 0:
 			return None
 		r = r1 / r2
-		return r
+		return float(f'{r:.4f}')
 	
 	#check and store // r = 0.9 and r = 1.1 are equidistent to 1
 	def	check_best_r(self, new_r, X, Y):
@@ -90,22 +90,31 @@ class R_correlation:
 @dataclass
 class Plot_2_correlated_columns:
 
-	def scatter_columns(self, r_array):
+	def scatter_columns(self, df_normalized, r_array):
+				
+		correlation_coefficient = r_array[0][0]
+		column_index1 = r_array[0][1]
+		column_index2 = r_array[0][2]
+		
 		# Retrieve the column names from the DataFrame using iloc
-		column_names = [self.df_normalized.columns[num ] for num in r_array[0]]
+		column_names = [df_normalized.columns[num] for num in [column_index1, column_index2]]
 
 		# Get the data for the two selected columns
-		x_data = df.iloc[:, r_array[0][1] - 1]
-		y_data = df.iloc[:, r_array[0][2] - 1]
+		x_data = df_normalized.index
+		y_data1 = df_normalized.iloc[:, column_index1] 
+		y_data2 = df_normalized.iloc[:, column_index2]
 
-		# Plot scatter with dots of different colors for each column
-		plt.scatter(x_data, y_data, c=['red', 'blue'], label=column_names)
-		plt.xlabel(column_names[0])
-		plt.ylabel(column_names[1])
+		# Use two colors for the two columns
+		colors = ['red', 'blue']
+		plt.scatter(x_data, y_data1, c=colors[0], label=column_names[0])
+		plt.scatter(x_data, y_data2, c=colors[1], label=column_names[1])
+		plt.xlabel("Students")
+		plt.ylabel("Notes")
 		plt.title('What are the two features that are similar ?')
-		plt.legend()
+		plt.legend(loc='upper left', bbox_to_anchor=(0, -0.1), borderaxespad=0.)
+		plt.text(0.5, 0.95, f'r = {correlation_coefficient}, Features: {column_names[0]} & {column_names[1]}',
+				horizontalalignment='center', verticalalignment='center', transform=plt.gca().transAxes)
 		plt.show()
-
 
 def main():
 	path = "datasets/dataset_train.csv"
@@ -118,7 +127,7 @@ def main():
 	r_array = rc.r_itteration_in_df_normalized(count_rows)
 	print(r_array)
 	pt = Plot_2_correlated_columns()
-	pt.scatter_columns(r_array)
+	pt.scatter_columns(df_normalized, r_array)
 
 if __name__ == "__main__":
 	main()
