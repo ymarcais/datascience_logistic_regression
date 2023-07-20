@@ -4,6 +4,7 @@ from histogram import Data_normalize
 from describe import Describe
 from dataclasses import dataclass
 from sklearn.preprocessing import StandardScaler
+import matplotlib.pyplot as plt
 
 @dataclass
 class R_correlation:
@@ -85,6 +86,25 @@ class R_correlation:
 				print(f" r{i} : {new_r}")
 				#self.r_array = np.array(self.r_array).reshape(-1, 3)
 		return self.r_array
+	
+@dataclass
+class Plot_2_correlated_columns:
+
+	def scatter_columns(self, r_array):
+		# Retrieve the column names from the DataFrame using iloc
+		column_names = [self.df_normalized.columns[num ] for num in r_array[0]]
+
+		# Get the data for the two selected columns
+		x_data = df.iloc[:, r_array[0][1] - 1]
+		y_data = df.iloc[:, r_array[0][2] - 1]
+
+		# Plot scatter with dots of different colors for each column
+		plt.scatter(x_data, y_data, c=['red', 'blue'], label=column_names)
+		plt.xlabel(column_names[0])
+		plt.ylabel(column_names[1])
+		plt.title('What are the two features that are similar ?')
+		plt.legend()
+		plt.show()
 
 
 def main():
@@ -97,6 +117,8 @@ def main():
 	count_rows = db.count_rows(df_normalized)
 	r_array = rc.r_itteration_in_df_normalized(count_rows)
 	print(r_array)
+	pt = Plot_2_correlated_columns()
+	pt.scatter_columns(r_array)
 
 if __name__ == "__main__":
 	main()
