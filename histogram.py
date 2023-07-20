@@ -107,7 +107,7 @@ class Statistiscal:
 			house_counts = self.unique_house_df[self.unique_house_df['Hogwarts House'] == house]['count']
 			house_mean = self.unique_house_df[self.unique_house_df['Hogwarts House'] == house]['house mean']
 			for student in students_mean.iterrows:
-				std = np.sum((students - house_mean)**2)
+				std = np.sum((student - house_mean)**2)
 			std = (std / (house_counts - 1))**0.5
 			self.unique_house_df.loc[self.unique_house_df['Hogwarts House'] == house, 'std'] = std
 		return self.unique_house_df
@@ -187,5 +187,9 @@ def main():
 
 if __name__ == "__main__":
     main()
+    
+
+
+#Deplacer filename?
   
     
