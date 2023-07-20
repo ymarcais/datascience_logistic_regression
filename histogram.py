@@ -41,8 +41,10 @@ class Data_normalize:
 	# Create a new DataFrame with the normalized numerical data and original index from cleaned_dataset
 	def index_to_normalized_data(self, normalized_numerical_data, numerical_columns, cleaned_dataset):
 		df_normalized = pd.DataFrame(normalized_numerical_data, columns=numerical_columns, index=cleaned_dataset.index)
-		df_normalized.to_csv("datasets/df_normalized.csv", sep='\t', index=True)
+		
 		return df_normalized
+
+#df_normalized.to_csv("datasets/df_normalized.csv", sep='\t', index=True)
 
 #Creation of a class for statistics computation
 @dataclass
@@ -82,7 +84,6 @@ class Statistiscal:
 	def count_student_per_house(self, df_mean):
 		house_counts = df_mean['Hogwarts House'].value_counts().reset_index()
 		house_counts.columns = ['Hogwarts House', 'count']
-		print(house_counts)
 		self.unique_house_df = pd.merge(self.unique_house_df, house_counts, on='Hogwarts House', how='left')
 
 		return self.unique_house_df
@@ -136,6 +137,13 @@ class Histogram:
 		fig, ax = plt.subplots()  # Create figure and axis objects
 		unique_house_df['std'] = unique_house_df['std'].astype(float) 
 
+		house_colors = {
+            'Ravenclaw': 'blue',
+            'Slytherin': 'green',
+            'Gryffindor': 'red',
+            'Hufflepuff': 'yellow'
+        }
+
 		for i, row in unique_house_df.iterrows():
 			house = row['Hogwarts House']
 			std_value = row['std']
@@ -143,7 +151,7 @@ class Histogram:
 
 			# Plot histogram bars using plt.bar
 			hist, bins = np.histogram(std_value, bins=n_bins)
-			ax.bar(bin_range[0], std_value, width=1, alpha=0.7, label=house)
+			ax.bar(bin_range[0], std_value, width=1, alpha=0.7, label=house, color=house_colors[house])
 
 		ax.set_xlabel(' ')
 		ax.set_ylabel('Standard Deviation')
@@ -186,6 +194,6 @@ def main():
 	htg.hogwarts_histogram(unique_house_df)
 
 if __name__ == "__main__":
-    main()
+	main()
   
     
