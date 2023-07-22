@@ -38,10 +38,9 @@ class Data_normalize:
 		normalized_numerical_data = scaler.transform(numerical_data)
 		return normalized_numerical_data
 	
-	# Create a new DataFrame with the normalized numerical data and original index from cleaned_dataset
+	# Add original index to Create a new DataFrame with the normalized numerical data and original index from cleaned_dataset
 	def index_to_normalized_data(self, normalized_numerical_data, numerical_columns, cleaned_dataset):
 		df_normalized = pd.DataFrame(normalized_numerical_data, columns=numerical_columns, index=cleaned_dataset.index)
-		
 		return df_normalized
 
 #df_normalized.to_csv("datasets/df_normalized.csv", sep='\t', index=True)
@@ -70,8 +69,8 @@ class Statistiscal:
 
 	# add house name of house to df_mean dataframe (using index as reference)
 	def add_house_name(self, df_mean, cleaned_dataset):
-		df_mean['Hogwarts House'] = cleaned_dataset.loc[df_mean.index, 'Hogwarts House']
-		df_mean.to_csv("datasets/df_mean.csv", sep='\t', index=True)
+		df_mean.loc[:, 'Hogwarts House'] = cleaned_dataset.loc[df_mean.index, 'Hogwarts House']
+		#df_mean.to_csv("datasets/df_mean.csv", sep='\t', index=True)
 		return df_mean
 	
 	# Create unique house name
@@ -101,18 +100,7 @@ class Statistiscal:
 		self.unique_house_df['house mean'] = self.unique_house_df['sum notes'] / self.unique_house_df['count']
 		return self.unique_house_df
 
-	def calculate_std(self, df_mean):
-		for house in self.unique_house_df['Hogwarts House']:
-			grouped = df_mean.groupby('Hogwarts House')
-			students_mean = grouped[grouped['Hogwarts House'] == house]['student mean']
-			house_counts = self.unique_house_df[self.unique_house_df['Hogwarts House'] == house]['count']
-			house_mean = self.unique_house_df[self.unique_house_df['Hogwarts House'] == house]['house mean']
-			for student in students_mean.iterrows:
-				std = np.sum((students - house_mean)**2)
-			std = (std / (house_counts - 1))**0.5
-			self.unique_house_df.loc[self.unique_house_df['Hogwarts House'] == house, 'std'] = std
-		return self.unique_house_df
-
+	# Calculate std whithout std()
 	def calculate_std(self, df_mean):
 		for house in self.unique_house_df['Hogwarts House']:
 			students_mean = df_mean[df_mean['Hogwarts House'] == house]['student mean']
