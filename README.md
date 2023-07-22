@@ -14,4 +14,9 @@ Data Analysis - Logistic Regression
 
 #V.2.2 Scatter plot
 - Similarities the Pearson's correlation : r = (Σ((X - X̄) * (Y - Ȳ))) / sqrt(Σ((X - X̄)^2) * Σ((Y - Ȳ)^2))
+- Testing all possible possibilities
+- Plot two correleted features
+
+#V.2.3 Pair plot
+
 
