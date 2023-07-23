@@ -18,5 +18,16 @@ Data Analysis - Logistic Regression
 - Plot two correleted features
 
 #V.2.3 Pair plot
+- X (m x n) : input matrix
+- θ_k (n x 1): Weight vector and b_k: a bias.
+- z is the linear combination of features and weights z = θ_k^T * X + b_k.
+- The logistic or sigmoid function activation function, given by:
+  σ(z) = 1 / (1 + e^(-z))
+- L(θ_k, b_k) = - (1/m) * Σ[y * log(σ(z)) + (1 - y) * log(1 - σ(z))] : The loss function for binary logistic
+  regression is the cross-entropy loss.
+- ∂L / ∂θ_k = (1/m) * Σ[(σ(z) - y) * X] : Gradient with respect to weights (θ_k). (σ(z) - y) is the difference between the predicted probability and the true target value for class k.
+- ∂L / ∂b_k = (1/m) * Σ(σ(z) - y) : Gradient with respect to bias (b_k):
+
+
 
 
