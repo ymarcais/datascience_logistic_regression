@@ -19,6 +19,7 @@ Data Analysis - Logistic Regression
 
 #V.2.3 Pair plot
 - pair_plot()
+<img src="./pair_plot.png" alt="Alt text" title="Final product" style="display: inline-block; max-width: 20px">
 
 # V.3 Logistic Regression
 - X (m x n) : input matrix
