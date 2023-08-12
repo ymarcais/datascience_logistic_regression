@@ -47,7 +47,7 @@ class Describe:
 		for index, row in NaN_distribution.iterrows():
 			if NaN_distribution[1][index] / rows > 0.5:
 				columns_to_drop.append(NaN_distribution[0][index])
-		dataset = dataset.drop(columns=columns_to_drop)
+		dataset = dataset.drop(columns = columns_to_drop)
 		return dataset
 
 	#delete NaN: drop lines if NaN
@@ -149,27 +149,7 @@ def main():
 	db = Describe(dataset_only_digit=None)
 	dataset = db.open_data("datasets/dataset_train.csv")
 	resume = db.generate_resume(dataset)
-	'''i = db.count_column(dataset)
-	j = db.count_rows(dataset)
-	l = db.distribution_NaN(dataset)
-	m = db.del_NaN_column(dataset)
-	cleaned_dataset = db.del_NaN_row(m)
-	is_only_digits = db.check_digits(cleaned_dataset)
-	o = db.init_resume(is_only_digits)
-	p = db.count_resume(o)
-	mean = db.mean_resume(is_only_digits, o)
-	std = db.std_resume(is_only_digits, o)
-	min = db.min_resume(is_only_digits, o)
-	max = db.max_resume(is_only_digits, o)
-	quart = db.quartiles_resume(is_only_digits, o)'''
-	#print("Is NaN distribution\n", l)
-	#print("Number of column:", i)
-	#print("Number of rows:", j)
-	#print("cleaned_dataset:\n", is_only_digits)
-	#print("del_NaN_column\n", m)
-	#print("resume mean:\n", o)
 	print("resume :\n", resume)
-	
 
 if __name__ == "__main__":
     main()

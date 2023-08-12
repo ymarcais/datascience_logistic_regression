@@ -9,7 +9,7 @@ from sklearn.preprocessing import StandardScaler
 @dataclass
 class Data_normalize:
 	path	: str
-	filename: str
+	#filename: str
 	db : Describe
 	#numerical_data : list
 
@@ -19,10 +19,10 @@ class Data_normalize:
 		return self.dataset
 
 	#clean data
-	def clean_data(self):
-		self.db.distribution_NaN(self.dataset)
-		self.db.del_NaN_column(self.dataset)
-		cleaned_dataset = self.db.del_NaN_row(self.dataset)
+	def clean_data(self, dataset):
+		self.db.distribution_NaN(dataset)
+		self.db.del_NaN_column(dataset)
+		cleaned_dataset = self.db.del_NaN_row(dataset)
 		return cleaned_dataset
 			
 	# Separate copy of the numerical columns
@@ -42,7 +42,17 @@ class Data_normalize:
 	def index_to_normalized_data(self, normalized_numerical_data, numerical_columns, cleaned_dataset):
 		df_normalized = pd.DataFrame(normalized_numerical_data, columns=numerical_columns, index=cleaned_dataset.index)
 		return df_normalized
-
+	
+	# Mother function
+	def data_normalize_(self):
+		self.dataset = self.import_data()
+		self.cleaned_dataset = self.clean_data(self.dataset)
+		numerical_columns = self.cleaned_dataset.select_dtypes(include=['int', 'float']).columns
+		numerical_data = self.separate_numerical(self.cleaned_dataset, numerical_columns)
+		normalized_numerical_data = self.normalizator(numerical_data)
+		df_normalized = self.index_to_normalized_data(normalized_numerical_data, numerical_columns, self.cleaned_dataset)
+		return df_normalized
+	
 #df_normalized.to_csv("datasets/df_normalized.csv", sep='\t', index=True)
 
 #Creation of a class for statistics computation
@@ -50,11 +60,10 @@ class Data_normalize:
 class Statistiscal:
 	db : Describe
 	dn : Data_normalize
-	unique_house_df: pd.DataFrame
+	#unique_house_df: pd.DataFrame
 
 	#calculate mean for each student
 	def note_student_mean(self, df_normalized):
-		db = Describe()
 		count = self.db.count_column(df_normalized)
 		df_mean = pd.DataFrame()
 		df_mean['Index'] = df_normalized.index
@@ -68,35 +77,32 @@ class Statistiscal:
 		return df_mean
 
 	# add house name of house to df_mean dataframe (using index as reference)
-	def add_house_name(self, df_mean, cleaned_dataset):
-		df_mean.loc[:, 'Hogwarts House'] = cleaned_dataset.loc[df_mean.index, 'Hogwarts House']
-		#df_mean.to_csv("datasets/df_mean.csv", sep='\t', index=True)
-		return df_mean
+	def add_house_name(self, df_mean):
+		df_mean_house = pd.DataFrame()
+		df_mean_house = df_mean
+		df_mean_house.loc[:, 'Hogwarts House'] = self.dn.cleaned_dataset.loc[df_mean.index, 'Hogwarts House']
+		return df_mean_house
 	
 	# Create unique house name
-	def unique_house(self, df_mean):
-		self.unique_house_df = pd.DataFrame({'Hogwarts House': df_mean['Hogwarts House'].unique()})
-		unique_house_count = df_mean['Hogwarts House'].nunique()
-		return unique_house_count
+	def unique_house(self, df_mean_house):
+		self.unique_house_df = pd.DataFrame({'Hogwarts House': df_mean_house['Hogwarts House'].unique()})
 		
 	# count number of student per house
-	def count_student_per_house(self, df_mean):
-		house_counts = df_mean['Hogwarts House'].value_counts().reset_index()
+	def count_student_per_house(self, df_mean_house):
+		house_counts = df_mean_house['Hogwarts House'].value_counts().reset_index()
 		house_counts.columns = ['Hogwarts House', 'count']
 		self.unique_house_df = pd.merge(self.unique_house_df, house_counts, on='Hogwarts House', how='left')
-
 		return self.unique_house_df
 	
 	# Sum all the notes of one house
-	def sum_student_notes_per_house(self, df_mean):
-		sum_notes = df_mean.groupby('Hogwarts House')['student mean'].sum().reset_index()
+	def sum_student_notes_per_house(self, df_mean_house):
+		sum_notes = df_mean_house.groupby('Hogwarts House')['student mean'].sum().reset_index()
 		sum_notes.columns = ['Hogwarts House', 'sum notes']
 		self.unique_house_df = pd.merge(self.unique_house_df, sum_notes, on='Hogwarts House', how='left')
 		return self.unique_house_df
 
-
 	# Caluculate mean for each house
-	def house_mean(self, df_mean):
+	def house_mean(self):
 		self.unique_house_df['house mean'] = self.unique_house_df['sum notes'] / self.unique_house_df['count']
 		return self.unique_house_df
 
@@ -112,18 +118,31 @@ class Statistiscal:
 			std = (std / (house_counts - 1))** 0.5
 			self.unique_house_df.loc[self.unique_house_df['Hogwarts House'] == house, 'std'] = std
 		return self.unique_house_df
+	
+	# Mother function
+	def statistical_(self, df_normalized):
+		df_mean = self.note_student_mean(df_normalized)
+		df_mean_house = self.add_house_name(df_mean)
+		self.unique_house(df_mean_house)
+		self.unique_house_df = self.count_student_per_house(df_mean_house)
+		self.sum_student_notes_per_house(df_mean_house)
+		self.unique_house_df = self.house_mean()
+		self.unique_house_df = self.calculate_std(df_mean)
+		with pd.option_context('display.max_rows', None):
+			print (self.unique_house_df)
+		
 
 #self.dn = Data_normalize()
 @dataclass
 class Histogram:
-	data_normalizer: Data_normalize
 	st : Statistiscal
 	
-	def hogwarts_histogram(self, unique_house_df):
-		n_bins = unique_house_df.shape[0]  # Number of bins equal to the number of rows
+	def hogwarts_histogram(self, path):
+		filename = path.split("/")[-1]
+		n_bins = self.st.unique_house_df.shape[0]  # Number of bins equal to the number of rows
 
 		fig, ax = plt.subplots()  # Create figure and axis objects
-		unique_house_df['std'] = unique_house_df['std'].astype(float) 
+		self.st.unique_house_df['std'] = self.st.unique_house_df['std'].astype(float) 
 
 		house_colors = {
             'Ravenclaw': 'blue',
@@ -132,7 +151,7 @@ class Histogram:
             'Hufflepuff': 'yellow'
         }
 
-		for i, row in unique_house_df.iterrows():
+		for i, row in self.st.unique_house_df.iterrows():
 			house = row['Hogwarts House']
 			std_value = row['std']
 			bin_range = (i, i + 1)  # Range for the bin positions on the x-axis
@@ -143,12 +162,12 @@ class Histogram:
 
 		ax.set_xlabel(' ')
 		ax.set_ylabel('Standard Deviation')
-		ax.set_title('{}'.format(self.data_normalizer.filename))
+		ax.set_title('{}'.format(filename))
 
-		ax.set_xticks(range(unique_house_df.shape[0]))  # Set the x-ticks to correspond to the row index
-		ax.set_xticklabels(unique_house_df['Hogwarts House'], rotation=45, ha='right')  # Set the x-tick labels to the house names
+		ax.set_xticks(range(self.st.unique_house_df.shape[0]))  # Set the x-ticks to correspond to the row index
+		ax.set_xticklabels(self.st.unique_house_df['Hogwarts House'], rotation=45, ha='right')  # Set the x-tick labels to the house names
 
-		ax.set_ylim(0, np.max(unique_house_df['std']))  # Set the y-axis limits based on the maximum value in std_values
+		ax.set_ylim(0, np.max(self.st.unique_house_df['std']))  # Set the y-axis limits based on the maximum value in std_values
 	
 		fig.tight_layout()
 		plt.show()
@@ -156,30 +175,13 @@ class Histogram:
 
 def main():
 	path = "datasets/dataset_train.csv"
-	filename = path.split("/")[-1]
-	unique_house_df = pd.DataFrame()  
 	db = Describe()
-	numerical_data = []
-	dn = Data_normalize(path, filename, db)
-	st = Statistiscal(db, dn, unique_house_df)
-	htg = Histogram(dn, st)
-	dataset = dn.import_data()
-	cleaned_dataset = dn.clean_data()
-	numerical_columns = cleaned_dataset.select_dtypes(include=['int', 'float']).columns
-	numerical_data = dn.separate_numerical(cleaned_dataset, numerical_columns)
-	normalized_numerical_data = dn.normalizator(numerical_data)
-	df_normalized = dn.index_to_normalized_data(normalized_numerical_data, numerical_columns, cleaned_dataset)
-	df_mean = st.note_student_mean(df_normalized)
-	df_mean = st.add_house_name(df_mean, cleaned_dataset)
-	unique_house_count = st.unique_house(df_mean)
-	unique_house_df = st.count_student_per_house(df_mean)
-	sum_student_notes_per_house = st.sum_student_notes_per_house(df_mean)
-	unique_house_df = st.house_mean(df_mean)
-	unique_house_df = st.calculate_std(df_mean)
-	with pd.option_context('display.max_rows', None):
-		#print (unique_house_count.to_string(index=True))
-		print (unique_house_df)
-	htg.hogwarts_histogram(unique_house_df)
+	dn = Data_normalize(path, db)
+	st = Statistiscal(db, dn)
+	htg = Histogram(st)
+	df_normalized = dn.data_normalize_()
+	st.statistical_(df_normalized)
+	htg.hogwarts_histogram(path)
 
 if __name__ == "__main__":
 	main()
