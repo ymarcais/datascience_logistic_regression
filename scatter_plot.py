@@ -19,7 +19,7 @@ class R_correlation:
 	def get_normalized_data(self):
 		numerical_data = []
 		dataset = self.dn.import_data()
-		cleaned_dataset = self.dn.clean_data()
+		cleaned_dataset = self.dn.clean_data(dataset)
 		numerical_columns = cleaned_dataset.select_dtypes(include=['int', 'float']).columns
 		numerical_data = self.dn.separate_numerical(cleaned_dataset, numerical_columns)
 		#normalized_numerical_data = self.dn.normalizator(numerical_data)
@@ -120,7 +120,7 @@ def main():
 	path = "datasets/dataset_train.csv"
 	filename = path.split("/")[-1]
 	db = Describe()
-	dn = Data_normalize(path, filename, db)
+	dn = Data_normalize(path, db)
 	rc = R_correlation(db, dn, r_array=[], df_normalized=[], count_rows = 0, last_r = 0)
 	df_normalized = rc.get_normalized_data()
 	count_rows = db.count_rows(df_normalized)
