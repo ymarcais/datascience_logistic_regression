@@ -22,10 +22,8 @@ class R_correlation:
 		cleaned_dataset = self.dn.clean_data(dataset)
 		numerical_columns = cleaned_dataset.select_dtypes(include=['int', 'float']).columns
 		numerical_data = self.dn.separate_numerical(cleaned_dataset, numerical_columns)
-		#normalized_numerical_data = self.dn.normalizator(numerical_data)
 		normalized_numerical_data = numerical_data # To delete after test
 		self.df_normalized = self.dn.index_to_normalized_data(normalized_numerical_data, numerical_columns, cleaned_dataset)
-		#self.df_normalized.to_csv("df_normalized.csv", sep='\t', index=True)
 		return self.df_normalized
 	
 	# One way to found similarities is to use Pearson's correlation which seems the most relevent related to the subject.
