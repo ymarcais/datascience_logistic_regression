@@ -39,18 +39,18 @@ Data Analysis - Logistic Regression
 
 2-Feature Scaling
 
-3 - Logistic Regression Model: P(y=1|x) = 1 / (1 + exp(-z))
+3-Logistic Regression Model: P(y=1|x) = 1 / (1 + exp(-z))
     - P(y=1|x) is the probability that the student belongs to Team 1.
     - z is the linear combination of features and their corresponding coefficients: z = θ0 + θ1*x1 + θ2*x2 + ... + θn*xn
     
-4 Cost Function : J(θ) = -1/m * Σ [ y*log(P) + (1-y)*log(1-P) ]
+4-Cost Function : J(θ) = -1/m * Σ [ y*log(P) + (1-y)*log(1-P) ]
 
-5 Gradient Descent : gradient descent to minimize the cost function and find the optimal coefficients (θ values).
+5-Gradient Descent : gradient descent to minimize the cost function and find the optimal coefficients (θ values).
       θi = θi - α * ∂J(θ)/∂θi
       
-6 Training
+6-Training
 
-7 Prediction
+7-Prediction
 
       
 
