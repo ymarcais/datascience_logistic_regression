@@ -77,10 +77,14 @@ class Statistiscal:
 		return df_mean
 
 	# add house name of house to df_mean dataframe (using index as reference)
-	def add_house_name(self, df_mean):
+	def add_house_name(self, df_mean, cleaned_dataset):
 		df_mean_house = pd.DataFrame()
 		df_mean_house = df_mean
-		df_mean_house.loc[:, 'Hogwarts House'] = self.dn.cleaned_dataset.loc[df_mean.index, 'Hogwarts House']
+		df_mean_house.loc[:, 'Hogwarts House'] = cleaned_dataset.loc[df_mean.index, 'Hogwarts House']
+		column_to_move = df_mean_house['Hogwarts House']
+		df_mean_house.drop(columns='Hogwarts House', inplace=True)
+		df_mean_house.insert(0, 'Hogwarts House', column_to_move)
+		print(df_mean_house)
 		return df_mean_house
 	
 	# Create unique house name
@@ -122,7 +126,7 @@ class Statistiscal:
 	# Mother function
 	def statistical_(self, df_normalized):
 		df_mean = self.note_student_mean(df_normalized)
-		df_mean_house = self.add_house_name(df_mean)
+		df_mean_house = self.add_house_name(df_mean, self.dn.cleaned_dataset)
 		self.unique_house(df_mean_house)
 		self.unique_house_df = self.count_student_per_house(df_mean_house)
 		self.sum_student_notes_per_house(df_mean_house)
