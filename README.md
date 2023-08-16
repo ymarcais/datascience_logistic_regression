@@ -35,16 +35,16 @@ Data Analysis - Logistic Regression
 - ∂L / ∂θ_k = (1/m) * Σ[(σ(z) - y) * X] : Gradient with respect to weights (θ_k). (σ(z) - y) is the difference between the predicted probability and the true target value for class k.
 - ∂L / ∂b_k = (1/m) * Σ(σ(z) - y) : Gradient with respect to bias (b_k).
 
-# 1 - Data Preparation:
-# 2 - Feature Scaling
-# 3 - Logistic Regression Model: P(y=1|x) = 1 / (1 + exp(-z))
+#1 Data Preparation:
+#2 Feature Scaling
+#3 - Logistic Regression Model: P(y=1|x) = 1 / (1 + exp(-z))
     - P(y=1|x) is the probability that the student belongs to Team 1.
     - z is the linear combination of features and their corresponding coefficients: z = θ0 + θ1*x1 + θ2*x2 + ... + θn*xn
-# 4 - Cost Function : J(θ) = -1/m * Σ [ y*log(P) + (1-y)*log(1-P) ]
-# 5 - Gradient Descent : gradient descent to minimize the cost function and find the optimal coefficients (θ values).
+#4 Cost Function : J(θ) = -1/m * Σ [ y*log(P) + (1-y)*log(1-P) ]
+#5 Gradient Descent : gradient descent to minimize the cost function and find the optimal coefficients (θ values).
       θi = θi - α * ∂J(θ)/∂θi
-# 6 - Training
-# 7 - Prediction
+#6 Training
+#7 Prediction
 
       
 
