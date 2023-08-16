@@ -35,9 +35,9 @@ Data Analysis - Logistic Regression
 - ∂L / ∂θ_k = (1/m) * Σ[(σ(z) - y) * X] : Gradient with respect to weights (θ_k). (σ(z) - y) is the difference between the predicted probability and the true target value for class k.
 - ∂L / ∂b_k = (1/m) * Σ(σ(z) - y) : Gradient with respect to bias (b_k).
 
-#1-Data Preparation:
+1-Data Preparation:
 
-#2-Feature Scaling
+2-Feature Scaling
 
 #3 - Logistic Regression Model: P(y=1|x) = 1 / (1 + exp(-z))
     - P(y=1|x) is the probability that the student belongs to Team 1.
