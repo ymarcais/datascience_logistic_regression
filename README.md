@@ -43,8 +43,8 @@ Data Analysis - Logistic Regression
   4 - Cost Function : J(θ) = -1/m * Σ [ y*log(P) + (1-y)*log(1-P) ]
   5 - Gradient Descent : gradient descent to minimize the cost function and find the optimal coefficients (θ values).
       θi = θi - α * ∂J(θ)/∂θi
-  6 : Training
-  7 : Prediction
+  6 - Training
+  7 - Prediction
 
       
 
