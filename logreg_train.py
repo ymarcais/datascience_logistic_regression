@@ -1,17 +1,18 @@
 import pandas as pd
 import numpy as np
 from dataclasses import dataclass, field
-#import matplotlib.pyplot as plt
+import matplotlib.pyplot as plt
+from pair_plot import Pairplot_graph
 #import matplotlib.ticker as ticker
 #from sklearn.preprocessing import StandardScaler
-import sys
+'''import sys
 sys.path.append('/mnt/nfs/homes/ymarcais/ft_linear_regression')
 #from gradient_descent import GradientDescent
 from describe import Describe
 from histogram import Data_normalize
 from histogram import Statistiscal
 from scatter_plot	import R_correlation
-from pair_plot import Pairplot_graph
+'''
 
 @dataclass
 class Logreg_train:
@@ -48,23 +49,24 @@ class Logreg_train:
 		Y_train = self.dataframe.iloc[:, 14:18].values
 		Y_train = Y_train.reshape(4, X_train.shape[1])
 		print(Y_train)
-		#return Y_train
+		return Y_train
 
-	def sigmoid(x):
+	def sigmoid(self, x):
 		return 1 / (1 + np.exp(-x))
 
-	def models(self, X, Y, learning_rate, iterations)
+	def models(self, X, Y, learning_rate, iterations):
+		cost_list =[]
 		m = X.shape[1]
-		n = X_train.shape[0]
+		n = X.shape[0]
 
-		W = np.zeros((n, 1))
+		W = np.zeros((n, 4))
 		B = 0
 
 		for i in range(iterations):
-			Z = np.dot(W.T, X_train) + B
+			Z = np.dot(W.T, X) + B
 			A = self.sigmoid(Z)
 		
-			cost = -(1/m) * np.sum(y * np.log(a) + (1 - y) * np.log(1 - a))
+			cost = -(1/m) * np.sum(Y * np.log(A) + (1 - Y) * np.log(1 - A))
 			dW = (1/m) * np.dot(A - Y, X.T)
 			dB =  (1/m) * np.sum(A - Y)
 
@@ -74,23 +76,34 @@ class Logreg_train:
 			cost_list.append(cost)
 
 			if(i % (iterations / 10 ) == 0):
-				print("cost after :", i, "iteration is : ", cost)
+				print("cost after :", i, "iterations is : ", cost)
 
 		return W, B, cost_list
-
 	
+	def accuracy(self, X, Y, W, B):
+		Z = np.dot(W.T, X) + B
+		A = self.sigmoid(Z)
+		A = A > 0.5
 
+		A = np.array(A, dtype= 'int64')
+		acc = (1 -np.sum(np.absolute(A - Y))/ Y.shape[1])*100
+		print("Accuracy of the model is  : ", acc)
+
+		
 
 def	main():
 	path = "datasets/dataset_train.csv"
-	iterations = 10000
-	learning_rate = 0.0005
+	iterations = 50000
+	learning_rate = 0.0015
 	lt = Logreg_train()
 	lt.get_data_(path)
 	lt.y_houses(path)
 	X_train = lt.X_train()
-	lt.Y_train(X_train)
-	W, Y, cost_list = models(X_train, Y_train,  learning_rate = learning_rate, iterations = iterations)
+	Y_train = lt.Y_train(X_train)
+	W, B, cost_list = lt.models(X_train, Y_train, learning_rate=learning_rate, iterations=iterations)
+	plt.title('Multi Class Logistic Regression', color='blue')
+	plt.plot(np.arange(iterations), cost_list)
+	plt.show()
 
 if __name__ == "__main__":
     main()
