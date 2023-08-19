@@ -3,16 +3,7 @@ import numpy as np
 from dataclasses import dataclass, field
 import matplotlib.pyplot as plt
 from pair_plot import Pairplot_graph
-#import matplotlib.ticker as ticker
-#from sklearn.preprocessing import StandardScaler
-'''import sys
-sys.path.append('/mnt/nfs/homes/ymarcais/ft_linear_regression')
-#from gradient_descent import GradientDescent
-from describe import Describe
-from histogram import Data_normalize
-from histogram import Statistiscal
-from scatter_plot	import R_correlation
-'''
+import csv
 
 @dataclass
 class Logreg_train:
@@ -77,9 +68,16 @@ class Logreg_train:
 
 			if(i % (iterations / 10 ) == 0):
 				print("cost after :", i, "iterations is : ", cost)
-
+		print("W is :", W)
 		return W, B, cost_list
 	
+	def save_weights(self, W):
+		file_path = 'datasets/weights.csv'
+		with open(file_path, mode='w', newline='') as file:
+			writer = csv.writer(file)
+			writer.writerow(['Weight'] * W.shape[1])
+			writer.writerows(W)
+		
 	def accuracy(self, X, Y, W, B):
 		Z = np.dot(W.T, X) + B
 		A = self.sigmoid(Z)
@@ -87,9 +85,10 @@ class Logreg_train:
 
 		A = np.array(A, dtype= 'int64')
 		acc = (1 -np.sum(np.absolute(A - Y))/ Y.shape[1])*100
-		print("Accuracy of the model is  : ", acc)
-
-		
+		rows, cols = Y.shape
+		#print("y row is:", rows)
+		#print("Y cols is:", cols)
+		print("B is : ", B)
 
 def	main():
 	path = "datasets/dataset_train.csv"
@@ -101,6 +100,8 @@ def	main():
 	X_train = lt.X_train()
 	Y_train = lt.Y_train(X_train)
 	W, B, cost_list = lt.models(X_train, Y_train, learning_rate=learning_rate, iterations=iterations)
+	lt.save_weights(W)
+	lt.accuracy(X_train, Y_train, W, B)
 	plt.title('Multi Class Logistic Regression', color='blue')
 	plt.plot(np.arange(iterations), cost_list)
 	plt.show()

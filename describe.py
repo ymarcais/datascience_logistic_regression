@@ -41,17 +41,18 @@ class Describe:
 	
 	#delete NaN: drop columns > 50% of NaN
 	def del_NaN_column(self, dataset):
-		rows = self.count_rows(dataset)
+		rows = dataset.shape[0]
 		NaN_distribution = pd.DataFrame(self.distribution_NaN(dataset))
 		columns_to_drop = []
 		for index, row in NaN_distribution.iterrows():
 			if NaN_distribution[1][index] / rows > 0.5:
 				columns_to_drop.append(NaN_distribution[0][index])
-		dataset = dataset.drop(columns = columns_to_drop)
+				dataset = dataset.drop(columns=columns_to_drop, axis=1)
 		return dataset
 
 	#delete NaN: drop lines if NaN
 	def del_NaN_row(self, dataset):
+		dataset = pd.DataFrame(dataset)
 		cleaned_dataset = dataset.dropna(axis=0)
 		return cleaned_dataset
 	

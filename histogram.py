@@ -20,9 +20,8 @@ class Data_normalize:
 
 	#clean data
 	def clean_data(self, dataset):
-		self.db.distribution_NaN(dataset)
-		self.db.del_NaN_column(dataset)
-		cleaned_dataset = self.db.del_NaN_row(dataset)
+		cleaned_dataset = self.db.del_NaN_column(dataset)
+		cleaned_dataset = self.db.del_NaN_row(cleaned_dataset)
 		return cleaned_dataset
 			
 	# Separate copy of the numerical columns
@@ -47,6 +46,7 @@ class Data_normalize:
 	def data_normalize_(self):
 		self.dataset = self.import_data()
 		self.cleaned_dataset = self.clean_data(self.dataset)
+		print("self cleanded dataset", self.cleaned_dataset)
 		numerical_columns = self.cleaned_dataset.select_dtypes(include=['int', 'float']).columns
 		numerical_data = self.separate_numerical(self.cleaned_dataset, numerical_columns)
 		normalized_numerical_data = self.normalizator(numerical_data)
