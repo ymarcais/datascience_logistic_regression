@@ -13,6 +13,7 @@ class Logreg_train:
 	def get_data_(self, path):
 		pg = Pairplot_graph()
 		self.dataframe = pg.data_(path)
+		print (self.dataframe)
 	
 	#list unique Hogwarts Houses
 	def get_houses_list(self, path):
