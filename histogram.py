@@ -46,7 +46,7 @@ class Data_normalize:
 	def data_normalize_(self):
 		self.dataset = self.import_data()
 		self.cleaned_dataset = self.clean_data(self.dataset)
-		print("self cleanded dataset", self.cleaned_dataset)
+		#print("self cleanded dataset", self.cleaned_dataset)
 		numerical_columns = self.cleaned_dataset.select_dtypes(include=['int', 'float']).columns
 		numerical_data = self.separate_numerical(self.cleaned_dataset, numerical_columns)
 		normalized_numerical_data = self.normalizator(numerical_data)
@@ -84,7 +84,7 @@ class Statistiscal:
 		column_to_move = df_mean_house['Hogwarts House']
 		df_mean_house.drop(columns='Hogwarts House', inplace=True)
 		df_mean_house.insert(0, 'Hogwarts House', column_to_move)
-		print(df_mean_house)
+		print(df_mean_house[:10])
 		return df_mean_house
 	
 	# Create unique house name

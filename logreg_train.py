@@ -13,8 +13,7 @@ class Logreg_train:
 	def get_data_(self, path):
 		pg = Pairplot_graph()
 		self.dataframe = pg.data_(path)
-		print (self.dataframe)
-	
+			
 	#list unique Hogwarts Houses
 	def get_houses_list(self, path):
 		houses_list = self.dataframe['Hogwarts House'].unique()
@@ -94,7 +93,7 @@ class Logreg_train:
 def	main():
 	path = "datasets/dataset_train.csv"
 	iterations = 50000
-	learning_rate = 0.0015
+	learning_rate = 0.002
 	lt = Logreg_train()
 	lt.get_data_(path)
 	lt.y_houses(path)
