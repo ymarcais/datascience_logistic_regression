@@ -1,3 +1,5 @@
+NB : I delete all rows with an empty data. So students can be missing.
+
 # datascience_logistic_regression
 Data Analysis - Logistic Regression
 
