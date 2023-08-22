@@ -1,6 +1,6 @@
 NB : I delete all rows with an empty data. So students can be missing.
 
-# datascience_logistic_regression
+# datascience : multi class logistic regression
 Data Analysis - Logistic Regression
 
 # V.1 Data Analysis
