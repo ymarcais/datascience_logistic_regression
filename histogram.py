@@ -84,7 +84,7 @@ class Statistiscal:
 		column_to_move = df_mean_house['Hogwarts House']
 		df_mean_house.drop(columns='Hogwarts House', inplace=True)
 		df_mean_house.insert(0, 'Hogwarts House', column_to_move)
-		print(df_mean_house[:10])
+		#print(df_mean_house[:10])
 		return df_mean_house
 	
 	# Create unique house name

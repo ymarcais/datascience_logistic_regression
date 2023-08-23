@@ -1,8 +1,6 @@
 import pandas as pd
 import numpy as np
-from dataclasses import dataclass, field
-import matplotlib.pyplot as plt
-from pair_plot import Pairplot_graph
+from dataclasses import dataclass
 from describe import Describe
 from histogram import Data_normalize
 from histogram import Statistiscal
@@ -14,41 +12,42 @@ class Logreg_predict:
 	datatest : np.ndarray = None
 	W : np.ndarray = None
 
+	#get file to predict
 	def get_x(self, path):
 		db = Describe()
 		dn = Data_normalize(path, db)
 		st = Statistiscal(db, dn)
 		dataset = dn.import_data()
+		dataset = pd.DataFrame(dataset)
+		
 		cleaned_dataset = dn.clean_data(dataset)
+		
 		numerical_columns = cleaned_dataset.select_dtypes(include=['int', 'float']).columns
 		numerical_data = dn.separate_numerical(cleaned_dataset, numerical_columns)
 		X = dn.normalizator(numerical_data)
-		print(X)
-		x, y = X.shape
-		print("X shape :", x, " X", y)
 		return X
+	
+	#extract W and B from CSV file
+	def get_W_B(self, path_W):
+		data = pd.read_csv(path_W, header=None)
+		W = data.iloc[1:, :4]
+		W = W.astype(np.float64)
+		B = data.iloc[1, 4]
+		B = float(B)
+		return W, B
 
+	#get prediction matrix filled with one 1 per line
 	def predict_(self, path_datatest, path_W):
 		lt = Logreg_train()
 		X = self.get_x(path_datatest)
-		print("dataset : ", X)
-		W = pd.read_csv(path_W)
-		print("W : ", W)
 
-		#Y = np.dot(W.T, X.T) -1.1052449834420803
+		W, B = self.get_W_B(path_W)
+
 		Y = np.zeros((4, 310))
-		W = W.values
-		x, y = W.shape
-		print("W shape :", x, " X", y)
-		x, y = X.shape
-		print("X shape :", x, " X", y)
-		Y = np.dot(X, W) -1.105582243394336
-		print("Y is : ", Y)
-		x, y = Y.shape
-		print("Y shape :", x, " X", y)
+		
+		Y = np.dot(X, W) + B
 		A = lt.sigmoid(Y)
-		x, y = A.shape
-		print("A shape :", x, " X", y)
+		
 		result = []
 		for row in A:
 			max_value = max(row)
@@ -57,17 +56,14 @@ class Logreg_predict:
 				
 		np.set_printoptions(threshold=np.inf)
 		result = np.array(result)
-		#print("result: ", result)
 		np.set_printoptions(threshold=310)
 		return result
 
+	#convert results 1 to house name
 	def convert_to_house_names(self, path_datatest, path_W):
 		result = self.predict_(path_datatest, path_W)
 		house_list = np.array(['Ravenclaw', 'Slytherin', 'Gryffindor', 'Hufflepuff']).reshape(-1, 1)
-		x, y = result.shape
-		print("result shape :", x, " X", y)
-		x, y = house_list.shape
-		print("house_list shape :", x, " X", y)
+		
 		prediction = []
 		for i in range(result.shape[0]):
 			houses = [i]
@@ -80,6 +76,7 @@ class Logreg_predict:
 		print(prediction[:10])
 		return prediction
 	
+	#save index and house name to csv
 	def save_csv(self, save_path, data_list):
 		with open(save_path, 'w', newline='') as csvfile:
 			csvwriter = csv.writer(csvfile)
@@ -91,10 +88,9 @@ def main():
 	path_datatest = "datasets/dataset_test.csv"
 	save_path = "datasets/houses.csv"
 	lp = Logreg_predict()
-	#lp.predict_(path_datatest, path_W)
-	#lp.get_x(path_datatest)
 	data_list = lp.convert_to_house_names(path_datatest, path_W)
 	lp.save_csv(save_path, data_list)
 
 if __name__ == "__main__":
 	main()
+
