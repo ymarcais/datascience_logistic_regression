@@ -4,10 +4,12 @@ from dataclasses import dataclass, field
 import matplotlib.pyplot as plt
 from pair_plot import Pairplot_graph
 import csv
+import time
 
 @dataclass
 class Logreg_train:
 	dataframe : np.ndarray = None
+	ema_beta = 0.9
     
 	#get data
 	def get_data_(self, path):
@@ -25,24 +27,16 @@ class Logreg_train:
 		for house in houses_list:
 			column_name = 'y_' + house
 			self.dataframe[column_name] = (self.dataframe['Hogwarts House'] == house).astype(int)
-		#print("self.dataframe :", self.dataframe.iloc[:, :-4])
-		#print("self.dataframe last four columns:", self.dataframe.iloc[:, -4:])
-
 	
 	#get X_train and reshape
 	def X_train(self):
 		X_train = self.dataframe.iloc[:, 1:14].values
 		X_train = X_train.T
-		#print(X_train)
 		return X_train
 	
 	#get Y_train and reshape
 	def Y_train(self, X_train):
 		Y_train = self.dataframe.iloc[:, 14:18].values
-		#print("Y_train :",Y_train[:10])
-		#Y_train = Y_train.reshape(4, X_train.shape[1])
-		#Y_train = pd.DataFrame(Y_train)
-		#print("Y_train :",Y_train[:10])
 		return Y_train
 
 	def sigmoid(self, x):
@@ -53,25 +47,16 @@ class Logreg_train:
 		m = X.shape[1]
 		n = X.shape[0]
 
+		print("m :", m)
+		print("n :", n)
+
 		W = np.zeros((n, 4))
 		B = 0
-		
-		x, y = W.shape
-		#print("W shape :", x, " X", y)
-		x, y = X.shape
-		#print("X shape :", x, " X", y)	
-
 		Y = Y.T
+
 		for i in range(iterations):
 			Z = np.dot(W.T, X) + B
-			#Y = Y.T
-
 			A = self.sigmoid(Z)
-			#x, y = A.shape
-			#print("A shape :", x, " X", y)
-			#x, y = Y.shape
-			#print("Y shape :", x, " X", y)
-
 			
 			cost = -(1/m) * np.sum(Y * np.log(A) + (1 - Y) * np.log(1 - A))
 			dW = (1/m) * np.dot(A - Y, X.T)
@@ -84,15 +69,51 @@ class Logreg_train:
 
 			if(i % (iterations / 10 ) == 0):
 				print("cost after :", i, "iterations is : ", cost)
-		x, y = Z.shape
 		return W, B, cost_list
 	
-	'''def save_weights(self, W):
-		file_path = 'datasets/weights.csv'
-		with open(file_path, mode='w', newline='') as file:
-			writer = csv.writer(file)
-			writer.writerow(['Weight'] * W.shape[1])
-			writer.writerows(W)'''
+	def mini_batch_model(self, X, Y, learning_rate, iterations):
+		cost_list =[]
+		m = X.shape[1]
+		n = X.shape[0]
+		ema_W = np.zeros((n, 4))
+		ema_B = 0
+		batch_size = 200
+		start_row = 0
+		end_row = m - m % 200
+		j = 0
+
+		W = np.zeros((n, 4))
+		B = 0
+		Y = Y.T
+
+		for start_row in range(0, end_row, batch_size):
+			batch = X[:, start_row:start_row + batch_size]
+			Y_batch = Y[:, start_row:start_row + batch_size]
+
+			for i in range(iterations):
+				Z = np.dot(W.T, batch) + B
+				A = self.sigmoid(Z)
+											
+				cost = -(1/m) * np.sum(Y_batch * np.log(A) + (1 - Y_batch) * np.log(1 - A))
+				
+				dW = (1/m) * np.dot(A - Y_batch, batch.T)
+				dB =  (1/m) * np.sum(A - Y_batch)
+
+				#ema_W = self.ema_beta * ema_W + (1 - self.ema_beta) * dW.T
+				#ema_B = self.ema_beta * ema_B + (1 - self.ema_beta) * dB
+
+				#W_update = learning_rate * ema_W
+				#W -= W_update
+				W -= learning_rate * dW.T
+				#B_update = learning_rate * ema_B
+				#B -= B_update
+				B -= learning_rate * dB
+				cost_list.append(cost)
+				j += 1
+
+			if(i % (iterations / 10 ) == 0):
+				print("cost after :", i, "iterations is : ", cost)
+		return W, B, cost_list, j
 	
 	def save_weights(self, W, B):
 		file_path = 'datasets/weights.csv'
@@ -110,38 +131,39 @@ class Logreg_train:
 		A = np.array(A, dtype= 'int64')
 		Y = Y.T
 		acc = (1 -np.sum(np.absolute(A - Y))/ Y.shape[1])*100
-		rows, cols = Y.shape
-		#print("y row is:", rows)
-		#print("Y cols is:", cols)
 		print("B is : ", B)
 		acc = f"{acc:.2f}"
 		print("Accuracy : ", acc, "%")
 
-	def plot_cost_loss(self, iterations, cost_list):
+	def plot_cost_loss(self, j, cost_list):
 		title_lines = [
 		'Multi Class Logistic Regression',
-		'Loss Descent',
+		'Mini Batch Stochastic Gradient Descent with Exponential Moving Averga (EMA)',
 		]
 		title = '\n'.join(title_lines)
 
 		plt.title(title, color='blue')
-		plt.plot(np.arange(iterations), cost_list, color='red')
+		plt.plot(np.arange(j), cost_list, color='red')
 		plt.show()
 
 def	main():
+	start = time.time()
 	path = "datasets/dataset_train.csv"
-	iterations = 10000
-	learning_rate = 0.0005
+	iterations = 100
+	learning_rate = 0.01
 	lt = Logreg_train()
 	lt.get_data_(path)
 	lt.y_houses(path)
 	X_train = lt.X_train()
 	Y_train = lt.Y_train(X_train)
-	W, B, cost_list = lt.models(X_train, Y_train, learning_rate=learning_rate, iterations=iterations)
+	#W, B, cost_list = lt.models(X_train, Y_train, learning_rate, iterations)
+	W, B, cost_list, j = lt.mini_batch_model(X_train, Y_train, learning_rate=learning_rate, iterations=iterations)
 	lt.save_weights(W, B)
 	lt.accuracy(X_train, Y_train, W, B)
-	lt.plot_cost_loss(iterations, cost_list)
-	
+	#lt.plot_cost_loss(j, cost_list)
+	#lt.plot_cost_loss(iterations, cost_list)
+	end = time.time()
+	print("time:", end - start)
 
 if __name__ == "__main__":
     main()
