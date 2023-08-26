@@ -1,4 +1,3 @@
-import pandas as pd
 import numpy as np
 from dataclasses import dataclass, field
 import matplotlib.pyplot as plt
@@ -39,38 +38,39 @@ class Logreg_train:
 		Y_train = self.dataframe.iloc[:, 14:18].values
 		return Y_train
 
+	# key function to help separate into 2 parts 1 / 0
 	def sigmoid(self, x):
 		return 1 / (1 + np.exp(-x))
+	
+	# use the derivatives of cost function to reduce the cost by iteration
+	def gradient_descent(self, Y, A, X, m, cost_list):
+		cost = -(1/m) * np.sum(Y * np.log(A) + (1 - Y) * np.log(1 - A))
+		dW = (1/m) * np.dot(A - Y, X.T)
+		dB = (1/m) * np.sum(A - Y)
+		cost_list.append(cost)
+		return cost_list, dW, dB
 
+	# model regression model with loss gradient descent
 	def models(self, X, Y, learning_rate, iterations):
 		cost_list =[]
 		m = X.shape[1]
 		n = X.shape[0]
-
-		print("m :", m)
-		print("n :", n)
-
 		W = np.zeros((n, 4))
 		B = 0
-		Y = Y.T
 
+		Y = Y.T
 		for i in range(iterations):
 			Z = np.dot(W.T, X) + B
 			A = self.sigmoid(Z)
 			
-			cost = -(1/m) * np.sum(Y * np.log(A) + (1 - Y) * np.log(1 - A))
-			dW = (1/m) * np.dot(A - Y, X.T)
-			dB =  (1/m) * np.sum(A - Y)
+			cost_list, dW, dB = self.gradient_descent(Y, A, X, m, cost_list)
 
 			W -= learning_rate * dW.T
 			B -= learning_rate * dB
-
-			cost_list.append(cost)
-
-			if(i % (iterations / 10 ) == 0):
-				print("cost after :", i, "iterations is : ", cost)
 		return W, B, cost_list
 	
+	# Aleternative to "models()" with stochastic batch and Exponential Moving Average
+	# But not very relevant in time with those data
 	def mini_batch_model(self, X, Y, learning_rate, iterations):
 		cost_list =[]
 		m = X.shape[1]
@@ -81,9 +81,9 @@ class Logreg_train:
 		start_row = 0
 		end_row = m - m % 200
 		j = 0
-
 		W = np.zeros((n, 4))
 		B = 0
+
 		Y = Y.T
 
 		for start_row in range(0, end_row, batch_size):
@@ -93,36 +93,32 @@ class Logreg_train:
 			for i in range(iterations):
 				Z = np.dot(W.T, batch) + B
 				A = self.sigmoid(Z)
-											
-				cost = -(1/m) * np.sum(Y_batch * np.log(A) + (1 - Y_batch) * np.log(1 - A))
-				
-				dW = (1/m) * np.dot(A - Y_batch, batch.T)
-				dB =  (1/m) * np.sum(A - Y_batch)
 
-				#ema_W = self.ema_beta * ema_W + (1 - self.ema_beta) * dW.T
-				#ema_B = self.ema_beta * ema_B + (1 - self.ema_beta) * dB
-
-				#W_update = learning_rate * ema_W
-				#W -= W_update
+				cost_list, dW, dB = self.gradient_descent(Y_batch, A, batch, m, cost_list)
 				W -= learning_rate * dW.T
-				#B_update = learning_rate * ema_B
-				#B -= B_update
 				B -= learning_rate * dB
-				cost_list.append(cost)
 				j += 1
+				''' Exponential Moving Average (EMA)
+				ema_W = self.ema_beta * ema_W + (1 - self.ema_beta) * dW.T
+				ema_B = self.ema_beta * ema_B + (1 - self.ema_beta) * dB
 
-			if(i % (iterations / 10 ) == 0):
-				print("cost after :", i, "iterations is : ", cost)
+				W_update = learning_rate * ema_W
+				W -= W_update
+				
+				B_update = learning_rate * ema_B
+				B -= B_update'''
 		return W, B, cost_list, j
 	
+	#Store W and B in CSV file
 	def save_weights(self, W, B):
 		file_path = 'datasets/weights.csv'
 		with open(file_path, mode='w', newline='') as file:
 			writer = csv.writer(file)
-			writer.writerow(['Weight']* W.shape[1] + ['Bias'])  # Include headers for Bias as well
+			writer.writerow(['Weight']* W.shape[1] + ['Bias'])
 			for i in range(W.shape[0]):
 				writer.writerow([W[i][j] for j in range(W.shape[1])] + [B])
 		
+	#Calculate the accuracy of the models
 	def accuracy(self, X, Y, W, B):
 		Z = np.dot(W.T, X) + B
 		A = self.sigmoid(Z)
@@ -131,14 +127,15 @@ class Logreg_train:
 		A = np.array(A, dtype= 'int64')
 		Y = Y.T
 		acc = (1 -np.sum(np.absolute(A - Y))/ Y.shape[1])*100
-		print("B is : ", B)
 		acc = f"{acc:.2f}"
 		print("Accuracy : ", acc, "%")
 
+	#Plot charts
 	def plot_cost_loss(self, j, cost_list):
 		title_lines = [
 		'Multi Class Logistic Regression',
-		'Mini Batch Stochastic Gradient Descent with Exponential Moving Averga (EMA)',
+		'Mini Batch Stochastic Gradient Descent',
+		'With Exponential Moving Averga (EMA)',
 		]
 		title = '\n'.join(title_lines)
 
@@ -160,8 +157,8 @@ def	main():
 	W, B, cost_list, j = lt.mini_batch_model(X_train, Y_train, learning_rate=learning_rate, iterations=iterations)
 	lt.save_weights(W, B)
 	lt.accuracy(X_train, Y_train, W, B)
-	#lt.plot_cost_loss(j, cost_list)
 	#lt.plot_cost_loss(iterations, cost_list)
+	lt.plot_cost_loss(j, cost_list)
 	end = time.time()
 	print("time:", end - start)
 
