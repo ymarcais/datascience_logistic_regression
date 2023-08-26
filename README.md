@@ -55,10 +55,10 @@ Gradient descent and mini batch gradient descent with Exponential Moving Average
 Save Weight & Bias to CSV file
 - <img src="./Multclass_Gradient_Descent.png" alt="Alt text" title="Multclass_Gradient_descent" style="display: inline-block; max-width: 20px">
 
-- <img src="./Stochastic_EMA_Gradien_ Descentt.png" alt="Alt text" title="Stochastic_EMA_Gradien_ Descent" style="display: inline-block; max-width: 20px">
+- <img src="./Stochastic_EMA_gradien_ descent.png" alt="Alt text" title="Stochastic_EMA_Gradien_ Descent" style="display: inline-block; max-width: 20px">
 
 7-Prediction
-It s working!
+ - It s working!
 
       
 
